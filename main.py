@@ -59,21 +59,42 @@ def clean_text(text: str) -> str:
 # ใส่ key ใน Environment Variables ของ Render (ห้ามใส่ในโค้ด)
 DEEPL_API_KEY = os.getenv("DEEPL_API_KEY", "")
 
+def _translate_deepl(text: str) -> str:
+    import requests as req
+    r = req.post(
+        "https://api-free.deepl.com/v2/translate",
+        headers={"Authorization": f"DeepL-Auth-Key {DEEPL_API_KEY}"},
+        json={"text": [text], "target_lang": "TH"},
+        timeout=10,
+    )
+    r.raise_for_status()
+    return r.json()["translations"][0]["text"]
+
+
+def _translate_google(text: str) -> str:
+    # Google Translate แบบไม่ต้องใช้ key (ฟรี ไม่เป็นทางการ เหมาะกับงานเดโม)
+    import requests as req
+    r = req.get(
+        "https://translate.googleapis.com/translate_a/single",
+        params={"client": "gtx", "sl": "en", "tl": "th", "dt": "t", "q": text},
+        timeout=10,
+    )
+    r.raise_for_status()
+    return "".join(part[0] for part in r.json()[0] if part and part[0])
+
+
 def translate_to_thai(text: str) -> str:
-    if not DEEPL_API_KEY:
-        return clean_text(text)
-    try:
-        cleaned = clean_text(text)[:500]
-        import requests as req
-        r = req.post(
-            "https://api-free.deepl.com/v2/translate",
-            headers={"Authorization": f"DeepL-Auth-Key {DEEPL_API_KEY}"},
-            json={"text": [cleaned], "target_lang": "TH"},
-            timeout=10
-        )
-        return r.json()["translations"][0]["text"]
-    except Exception:
-        return clean_text(text)
+    cleaned = clean_text(text)[:500]
+    # มี DeepL key ใช้ DeepL ก่อน / ไม่มีหรือใช้ไม่ได้ -> Google / พังหมด -> คืนภาษาอังกฤษ
+    translators = ([_translate_deepl] if DEEPL_API_KEY else []) + [_translate_google]
+    for tr in translators:
+        try:
+            out = tr(cleaned)
+            if out:
+                return out
+        except Exception:
+            continue
+    return cleaned
 
 def extract_tags(reviews, sentiment):
     keywords = POS_KEYWORDS if sentiment == "pos" else NEG_KEYWORDS
