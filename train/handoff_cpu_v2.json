@@ -1,0 +1,51 @@
+{
+  "base_model": "cardiffnlp/twitter-roberta-base-sentiment",
+  "old_model_local_path": "steam_model\\final_model",
+  "new_model_local_path": "steam_model_cpu_v2\\final_model",
+  "dataset_source": "Steam UserReviewsService API",
+  "labels": {
+    "0": "negative",
+    "1": "positive"
+  },
+  "neutral_definition": "max class probability < 0.6",
+  "neutral_threshold": 0.6,
+  "test_mode": true,
+  "dataset_sizes": {
+    "total": 2898,
+    "train": 2318,
+    "validation": 290,
+    "test": 290
+  },
+  "training": {
+    "device": "CPU",
+    "cpu_threads": 2,
+    "epochs": 3,
+    "train_batch_size": 4,
+    "gradient_accumulation_steps": 2,
+    "effective_batch_size": 8,
+    "eval_batch_size": 4,
+    "max_length": 128,
+    "learning_rate": 1.5e-05,
+    "weight_decay": 0.01,
+    "train_minutes": 82.19
+  },
+  "comparison": [
+    {
+      "model": "Baseline (pretrained)",
+      "accuracy": 0.8482758620689655,
+      "macro_f1": 0.8476890756302521
+    },
+    {
+      "model": "Fine-tuned old (historical log)",
+      "accuracy": 0.83,
+      "macro_f1": 0.83
+    },
+    {
+      "model": "Fine-tuned new (CPU)",
+      "accuracy": 0.896551724137931,
+      "macro_f1": 0.8964285714285715
+    }
+  ],
+  "note": "If old local model exists, old and new models are evaluated on the same new test set. Historical log values are only used if the local old model cannot be found.",
+  "huggingface_push": false
+}
