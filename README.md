@@ -81,9 +81,9 @@ TOP_N = 300  # เพิ่มหรือลดได้ตามต้อง�
 
 | ชื่อ | บทบาท |
 |---|---|
-| [ชื่อคนที่ 1] | Data & Model — เก็บ dataset, train และ evaluate model |
+| พรรศภรณ์ รักงาม | Data & Model — เก็บ dataset, train และ evaluate model |
 | รัตนาภรณ์ วรรณศรี | Steam API — เขียนโค้ดดึงรีวิวจาก Steam |
 | ชนันท์รัช เกตวันดี | Web Application — ออกแบบและพัฒนา UI |
-| [ชื่อคนที่ 4] | Deployment — deploy ระบบขึ้น Render |
+| วราภรณ์ ศรีบุรินทร์ | Deployment — deploy ระบบขึ้น Render |
 | ฐิติมา ธาดาบุษบง | Report & Presentation — จัดทำรายงานและสไลด์ |
 
