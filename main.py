@@ -1,5 +1,5 @@
+import os
 import re
-import time
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
@@ -7,18 +7,43 @@ from steam_reviews import search_games, fetch_top_reviews
 
 app = FastAPI()
 
-from transformers import pipeline
+# ===== เลือกโมเดล =====
+# SENTIMENT_BACKEND=tfidf        -> TF-IDF + Logistic Regression (ค่าเริ่มต้น, ใช้ RAM น้อย รันบน Render ฟรีได้)
+# SENTIMENT_BACKEND=transformer  -> pansaporn/steam-sentiment (ต้องใช้ RAM ~2GB ขึ้นไป)
+BACKEND = os.getenv("SENTIMENT_BACKEND", "tfidf").lower()
+NEUTRAL_THRESHOLD = float(os.getenv("NEUTRAL_THRESHOLD", "0.6"))
 
-clf = pipeline("text-classification", model="pansaporn/steam-sentiment", top_k=None)
-NEUTRAL_THRESHOLD = 0.6
+if BACKEND == "transformer":
+    from transformers import pipeline
+    clf = pipeline("text-classification",
+                   model=os.getenv("HF_MODEL", "pansaporn/steam-sentiment"), top_k=None)
 
-def mock_classify(texts):
-    results = clf(texts, truncation=True, max_length=128, batch_size=64)
-    return [
-        "neutral" if max(r, key=lambda x: x["score"])["score"] < NEUTRAL_THRESHOLD
-        else max(r, key=lambda x: x["score"])["label"]
-        for r in results
-    ]
+    def classify(texts):
+        results = clf(texts, truncation=True, max_length=128, batch_size=16)
+        out = []
+        for r in results:
+            best = max(r, key=lambda x: x["score"])
+            out.append("neutral" if best["score"] < NEUTRAL_THRESHOLD else best["label"])
+        return out
+else:
+    import joblib
+    from pathlib import Path
+
+    model_path = Path(__file__).parent / "model" / "tfidf_lr.joblib"
+    if not model_path.exists():
+        # ยังไม่เคยเทรน -> เทรนเลย (ใช้เวลาไม่กี่วินาที)
+        import train_tfidf
+        train_tfidf.main()
+    clf = joblib.load(model_path)
+
+    def classify(texts):
+        probs = clf.predict_proba(texts)
+        labels = clf.classes_
+        out = []
+        for p in probs:
+            i = p.argmax()
+            out.append("neutral" if p[i] < NEUTRAL_THRESHOLD else str(labels[i]))
+        return out
 
 POS_KEYWORDS = ["story", "graphic", "gameplay", "music", "open world", "fun", "content", "worth"]
 NEG_KEYWORDS = ["crash", "bug", "hard", "price", "fps", "lag", "boring", "refund"]
@@ -31,9 +56,12 @@ def clean_text(text: str) -> str:
     text = re.sub(r'\s+', ' ', text).strip()
     return text
 
-DEEPL_API_KEY = "d5763e2c-4274-479d-ab86-038821c4fca8:fx"
+# ใส่ key ใน Environment Variables ของ Render (ห้ามใส่ในโค้ด)
+DEEPL_API_KEY = os.getenv("DEEPL_API_KEY", "")
 
 def translate_to_thai(text: str) -> str:
+    if not DEEPL_API_KEY:
+        return clean_text(text)
     try:
         cleaned = clean_text(text)[:500]
         import requests as req
@@ -51,6 +79,10 @@ def extract_tags(reviews, sentiment):
     keywords = POS_KEYWORDS if sentiment == "pos" else NEG_KEYWORDS
     text_all = " ".join(clean_text(r["text"]).lower() for r in reviews)
     return [k for k in keywords if k in text_all][:4]
+
+@app.get("/healthz")
+def healthz():
+    return {"status": "ok", "backend": BACKEND}
 
 @app.get("/search")
 def search(q: str):
@@ -87,7 +119,7 @@ def analyze(game: str):
 
     # วิเคราะห์ sentiment
     texts = [clean_text(r["text"])[:512] for r in reviews]
-    sentiments = mock_classify(texts)
+    sentiments = classify(texts)
 
     pos = sentiments.count("positive")
     neg = sentiments.count("negative")
