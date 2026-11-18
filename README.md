@@ -85,5 +85,5 @@ TOP_N = 300  # เพิ่มหรือลดได้ตามต้อง�
 | [ชื่อคนที่ 2] | Steam API — เขียนโค้ดดึงรีวิวจาก Steam |
 | [ชื่อคนที่ 3] | Web Application — ออกแบบและพัฒนา UI |
 | [ชื่อคนที่ 4] | Deployment — deploy ระบบขึ้น Render |
-| [ชื่อคนที่ 5] | Report & Presentation — จัดทำรายงานและสไลด์ |
+| [ฐิติมา ธาดาบุษบง] | Report & Presentation — จัดทำรายงานและสไลด์ |
 
