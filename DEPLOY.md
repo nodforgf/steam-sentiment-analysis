@@ -2,7 +2,7 @@
 
 ## 1. ขึ้นไฟล์ทั้งหมดไป GitHub
 ไฟล์ที่ต้องมีใน repo: `main.py`, `steam_reviews.py`, `train_tfidf.py`, `requirements.txt`,
-`render.yaml`, `static/index.html`, `Train/reviews_all_games.csv`, `Train/web_disco_elysium_the_final_cut.csv`
+`render.yaml`, `static/index.html` และโฟลเดอร์ `train 1811/` (ใช้เทรนโมเดลตอน build)
 
 ```
 git add .
