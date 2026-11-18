@@ -83,7 +83,7 @@ TOP_N = 300  # เพิ่มหรือลดได้ตามต้อง�
 |---|---|
 | [ชื่อคนที่ 1] | Data & Model — เก็บ dataset, train และ evaluate model |
 | [ชื่อคนที่ 2] | Steam API — เขียนโค้ดดึงรีวิวจาก Steam |
-| [ชื่อคนที่ 3] | Web Application — ออกแบบและพัฒนา UI |
+| ชนันท์รัช เกตวันดี | Web Application — ออกแบบและพัฒนา UI |
 | [ชื่อคนที่ 4] | Deployment — deploy ระบบขึ้น Render |
-| [ฐิติมา ธาดาบุษบง] | Report & Presentation — จัดทำรายงานและสไลด์ |
+| ฐิติมา ธาดาบุษบง | Report & Presentation — จัดทำรายงานและสไลด์ |
 
