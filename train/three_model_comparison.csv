@@ -1,4 +1,0 @@
-﻿model,accuracy,macro_f1
-Baseline (pretrained),0.8482758620689655,0.8476890756302521
-Fine-tuned old (historical log),0.83,0.83
-Fine-tuned new (CPU),0.896551724137931,0.8964285714285715
