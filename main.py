@@ -158,7 +158,13 @@ def analyze(game: str):
         r["sentiment"] = "pos" if s == "positive" else "neg" if s == "negative" else "neu"
 
     # แปลเฉพาะ top 5
-    top5 = reviews[:5]
+    # ถ้ามีไฟล์ review_filter.py จะข้ามรีวิวที่มีคำไม่เหมาะสม/มีม ไม่เอามาแสดง
+    # (ลบไฟล์นั้นทิ้ง = กลับไปแสดง 5 อันดับแรกเหมือนเดิม)
+    try:
+        from review_filter import is_clean
+        top5 = [r for r in reviews if is_clean(clean_text(r["text"]))][:5]
+    except ImportError:
+        top5 = reviews[:5]
     for r in top5:
         r["text_clean"] = clean_text(r["text"])
         r["text_th"] = translate_to_thai(r["text"])
