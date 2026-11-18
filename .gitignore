@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Secrets (เก็บ API key ไว้ในไฟล์นี้ ห้ามขึ้น GitHub)
+.env
+.env.*
+
+# Hugging Face / model cache
+.cache/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ไฟล์ CSV ที่ได้จาก steam_reviews.py
+# ถ้าอยากเก็บข้อมูลรีวิวไว้ใน repo ด้วย ให้ใส่ # ไว้หน้าบรรทัดล่าง
+reviews_*.csv
