@@ -35,14 +35,19 @@ else:
         import train_tfidf
         train_tfidf.main()
     clf = joblib.load(model_path)
+    from train_tfidf import ensemble_pos_prob
 
     def classify(texts):
-        probs = clf.predict_proba(texts)
-        labels = clf.classes_
+        # ความน่าจะเป็นบวก = เฉลี่ย TF-IDF+LR กับ VADER
+        # >= 0.6 บวก / <= 0.4 ลบ / ตรงกลาง = กลาง (ตาม NEUTRAL_THRESHOLD)
         out = []
-        for p in probs:
-            i = p.argmax()
-            out.append("neutral" if p[i] < NEUTRAL_THRESHOLD else str(labels[i]))
+        for p in ensemble_pos_prob(clf, texts):
+            if p >= NEUTRAL_THRESHOLD:
+                out.append("positive")
+            elif p <= 1 - NEUTRAL_THRESHOLD:
+                out.append("negative")
+            else:
+                out.append("neutral")
         return out
 
 POS_KEYWORDS = ["story", "graphic", "gameplay", "music", "open world", "fun", "content", "worth"]
@@ -139,7 +144,9 @@ def analyze(game: str):
         return JSONResponse(status_code=503, content={"error": "ดึงรีวิวไม่ได้ เกมนี้อาจมีรีวิวน้อยเกินไป"})
 
     # วิเคราะห์ sentiment
-    texts = [clean_text(r["text"])[:512] for r in reviews]
+    # transformer รับได้ ~512 token / TF-IDF ใช้ข้อความยาวกว่าได้
+    max_chars = 512 if BACKEND == "transformer" else 3000
+    texts = [clean_text(r["text"])[:max_chars] for r in reviews]
     sentiments = classify(texts)
 
     pos = sentiments.count("positive")

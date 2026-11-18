@@ -29,7 +29,7 @@ git push
 
 ## หมายเหตุ
 - แพ็กเกจฟรีจะ "หลับ" ถ้าไม่มีคนเข้า 15 นาที คนแรกที่เข้าจะรอ ~1 นาทีให้ตื่น
-- แพ็กเกจฟรีมี RAM 512MB จึงใช้โมเดล TF-IDF + Logistic Regression (ค่าเริ่มต้น)
+- แพ็กเกจฟรีมี RAM 512MB จึงใช้โมเดล TF-IDF + Logistic Regression รวมกับ VADER (ค่าเริ่มต้น) เทรนจาก `train 1811`
 - ถ้าจะใช้โมเดล Transformer `pansaporn/steam-sentiment` ต้องเปลี่ยนเป็นแพ็กเกจที่มี RAM 2GB ขึ้นไป แล้วตั้ง
   - Build Command: `pip install -r requirements-transformer.txt`
   - Environment: `SENTIMENT_BACKEND=transformer`
